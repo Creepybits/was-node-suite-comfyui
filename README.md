@@ -1,4 +1,4 @@
-# **WAS** Node Suite (Retired) &nbsp; [![Colab](https://camo.githubusercontent.com/84f0493939e0c4de4e6dbe113251b4bfb5353e57134ffd9fcab6b8714514d4d1/68747470733a2f2f636f6c61622e72657365617263682e676f6f676c652e636f6d2f6173736574732f636f6c61622d62616467652e737667)](https://colab.research.google.com/github/WASasquatch/was-node-suite-comfyui/blob/main/ComfyUI_%2B_WAS_Node_Suite_and_ComfyUI_Manager.ipynb) [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FWASasquatch%2Fwas-node-suite-comfyui&count_bg=%233D9CC8&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com) [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/ThompsonJordan?country.x=US&locale.x=en_US)
+# **WAS** Node Suite (Revised)
 
 <p align="center">
     <img src="https://user-images.githubusercontent.com/1151589/228982359-4a6215cc-3ca9-4c24-8a7b-d229d7bce277.png">
@@ -6,16 +6,12 @@
 
 ### A node suite for [ComfyUI](https://github.com/comfyanonymous/ComfyUI) with many new nodes, such as image processing, text processing, and more.
 
-#### [Share Workflows](https://github.com/WASasquatch/was-node-suite-comfyui/wiki/Workflow-Examples) to the workflows wiki. Preferably embedded PNGs with workflows, but JSON is OK too. [You can use this tool to add a workflow to a PNG file easily](https://colab.research.google.com/drive/1hQMjNUdhMQ3rw1Wcm3_umvmOMeS_K4s8?usp=sharing).
-#### Consider [donating to the project](https://paypal.me/ThompsonJordan?country.x=US&locale.x=en_US) to help it's continued development.
+#### [Share Workflows](https://github.com/WASasquatch/was-node-suite-comfyui/wiki/Workflow-Examples) to the workflows wiki. Preferably embedded PNGs with workflows, but JSON is OK too. 
+
 
 # Important Updates
+* **06/03/2025** The original author of WAS-NS has retired, so a revised version of the node pack has been registered.
 
-- **12/15/2023** WAS-NS is not under active development. I do not have the time and have other obligations. Feel free to fork and continue the project. I will approve appropriate and beneficial PRs.
-- **[Updated 10/8/2023]** BLIP is now a shipped module of WAS-NS and no longer requires the BLIP Repo
- - **[Updated 5/29/2023]** `ASCII` **is deprecated**. The new preferred method of text node output is `STRING`. This is a change from `ASCII` so that it is more clear what data is being passed.
-   - The `was_suite_config.json` will automatically set `use_legacy_ascii_text` to `false`.
- -  [Video Nodes](https://github.com/WASasquatch/was-node-suite-comfyui#video-nodes) - There are two new video nodes, `Write to Video` and `Create Video from Path`. These are experimental nodes.
 
 # Current Nodes:
 
@@ -359,6 +355,12 @@ The token name can be anything excluding the `:` character to define your token.
 
 # Other Features
 
+### Security Setup
+
+- The `Save Text File` and `Export API` nodes have write functionality. Since this can pose a security risk, writing is only allowed to paths listed in the whitelist file.
+- Whitelist file path: `<USER_DIRECTORY>/default/was-node-suite/whitelist-dirs.list`
+* `<USER_DIRECTORY>` typically refers to the `ComfyUI/user` directory.
+
 ### Import AUTOMATIC1111 WebUI Styles
 When using the latest builds of WAS Node Suite a `was_suite_config.json` file will be generated (if it doesn't exist). In this file you can setup a A1111 styles import.
 
@@ -378,7 +380,7 @@ If you're running on Linux, or non-admin account on windows you'll want to ensur
 There is now a **install.bat** you can run to install to portable if detected. Otherwise it will default to system and assume you followed ConfyUI's manual installation steps.
 
   - Navigate to your `/ComfyUI/custom_nodes/` folder
-  - Run `git clone https://github.com/WASasquatch/was-node-suite-comfyui/`
+  - Run `git clone https://github.com/ltdrdata/was-node-suite-comfyui/`
   - Navigate to your `was-node-suite-comfyui` folder
     - Portable/venv:
        - Run `path/to/ComfUI/python_embeded/python.exe -s -m pip install -r requirements.txt`
@@ -404,12 +406,13 @@ If you're running on Linux, or non-admin account on windows you'll want to ensur
     - WAS Suite should uninstall legacy nodes automatically for you.
     - Tools will be located in the WAS Suite menu.
 
-This method will not install the resources required for Image Crop Face node, and you'll have to download the [./res/](https://github.com/WASasquatch/was-node-suite-comfyui/tree/main/res) folder yourself.
+This method will not install the resources required for Image Crop Face node, and you'll have to download the [./res/](https://github.com/ltdrdata/was-node-suite-comfyui/tree/main/res) folder yourself.
+
 
 ## Installing on Colab
 Create a new cell and add the following code, then run the cell. You may need to edit the path to your `custom_nodes` folder. You can also use the [colab hosted here](https://colab.research.google.com/github/WASasquatch/comfyui-colab-was-node-suite/blob/main/ComfyUI_%2B_WAS_Node_Suite.ipynb)
 
-  - `!git clone https://github.com/WASasquatch/was-node-suite-comfyui /content/ComfyUI/custom_nodes/was-node-suite-comfyui`
+  - `!git clone https://github.com/ltdrdata/was-node-suite-comfyui /content/ComfyUI/custom_nodes/was-node-suite-comfyui`
   - `!pip install -r /content/ComfyUI/custom_nodes/was-node-suite-comfyui/requirements.txt`
   - Restart Colab Runtime (don't disconnect)
     - Tools will be located in the WAS Suite menu.

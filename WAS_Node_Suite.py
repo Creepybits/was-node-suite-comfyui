@@ -1,3 +1,9 @@
+###########################################################################
+#
+# Revised by Dr.Lt.Data after the original author, WASasquatch, retired.
+#
+###########################################################################
+#
 # By WASasquatch (Discord: WAS#0263)
 #
 # Copyright 2023 Jordan Thompson (WASasquatch)
@@ -12,7 +18,8 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
+#
+###########################################################################
 
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageDraw, ImageChops, ImageFont
 from PIL.PngImagePlugin import PngInfo
@@ -50,10 +57,10 @@ from tqdm import tqdm
 p310_plus = (sys.version_info >= (3, 10))
 
 MANIFEST = {
-    "name": "WAS Node Suite",
-    "version": (2,2,2),
+    "name": "WAS Node Suite (Revised)",
+    "version": (3,0,0),
     "author": "WASasquatch",
-    "project": "https://github.com/WASasquatch/was-node-suite-comfyui",
+    "project": "https://github.com/ltdrdata/was-node-suite-comfyui",
     "description": "An extensive node suite for ComfyUI with over 180 new nodes",
 }
 
@@ -154,6 +161,11 @@ STYLES_PATH = os.path.join(WAS_CONFIG_DIR, 'styles.json')
 DEFAULT_NSP_PANTRY_PATH = os.path.join(WAS_CONFIG_DIR, 'nsp_pantry.json')
 ALLOWED_EXT = ('.jpeg', '.jpg', '.png',
                         '.tiff', '.gif', '.bmp', '.webp')
+WAS_USER_CONFIG_DIR = os.path.join(comfy_paths.get_user_directory(), 'default', 'was-node-suite')
+WAS_USER_CONFIG_WHITELIST_DIRS_FILE = os.path.join(WAS_USER_CONFIG_DIR, 'whitelist-dirs.list')
+
+if not os.path.exists(WAS_USER_CONFIG_DIR):
+    os.makedirs(WAS_USER_CONFIG_DIR)
 
 
 #! INSTALLATION CLEANUP
@@ -214,8 +226,24 @@ was_conf_template = {
                     "wildcard_api": True,
                 }
 
+allowed_dirs = []
+
 # Create, Load, or Update Config
 
+def loadAllowedDir():
+    if not os.path.exists(WAS_USER_CONFIG_WHITELIST_DIRS_FILE):
+        # default whitelist (input, output, temp)
+        with open(WAS_USER_CONFIG_WHITELIST_DIRS_FILE, 'w', encoding="UTF-8") as f:
+            f.write(comfy_paths.get_input_directory()+'\n')
+            f.write(comfy_paths.get_output_directory()+'\n')
+            f.write(comfy_paths.get_temp_directory()+'\n')
+
+    with open(WAS_USER_CONFIG_WHITELIST_DIRS_FILE, 'r', encoding="UTF-8", errors="ignore") as f:
+        for x in f.readlines():
+            y = x.strip()
+            if not y.startswith('#') and y != '':
+                allowed_dirs.append(y)
+                
 def getSuiteConfig():
     global was_conf_template
     try:
@@ -261,6 +289,10 @@ else:
 
     if update_config:
         updateSuiteConfig(was_config)
+
+
+loadAllowedDir()
+
 
 # WAS Suite Locations Debug
 if was_config.__contains__('show_startup_junk'):
@@ -329,6 +361,18 @@ if was_config.__contains__('webui_styles'):
 
 
 #! SUITE SPECIFIC CLASSES & FUNCTIONS
+
+# Whitelist dir check
+def isAllowedFilepath(x):
+    x = os.path.abspath(x)
+    for base in allowed_dirs:
+        print(f"AAA: {x} / {base}")
+        print(f"BBB: {os.path.commonpath([x, base])}")
+        base = os.path.abspath(base)
+        if os.path.commonpath([x, base]) == base:
+            return True
+    return False
+
 
 # Freeze PIP modules
 def packages(versions=False):
@@ -482,7 +526,7 @@ def nsp_parse(text, seed=0, noodle_key='__', nspterminology=None, pantry_path=No
         if pantry_path is None:
             pantry_path = DEFAULT_NSP_PANTRY_PATH
         if not os.path.exists(pantry_path):
-            response = urlopen('https://raw.githubusercontent.com/WASasquatch/noodle-soup-prompts/main/nsp_pantry.json')
+            response = urlopen('https://raw.githubusercontent.com/ltdrdata/noodle-soup-prompts/main/nsp_pantry.json')
             tmp_pantry = json.loads(response.read())
             # Dump JSON locally
             pantry_serialized = json.dumps(tmp_pantry, indent=4)
@@ -2181,7 +2225,7 @@ class WAS_Tools_Class():
     def make_seamless(self, image, blending=0.5, tiled=False, tiles=2):
 
         if 'img2texture' not in packages():
-            install_package('git+https://github.com/WASasquatch/img2texture.git')
+            install_package('git+https://github.com/ltdrdata/img2texture.git')
 
         from img2texture import img2tex
         from img2texture._tiling import tile
@@ -3150,7 +3194,7 @@ class WAS_Image_Crop_Face:
         if not face_location:
             for cascade in cascades:
                 if not os.path.exists(cascade):
-                    cstr(f"Unable to find cascade XML file at `{cascade}`. Did you pull the latest files from https://github.com/WASasquatch/was-node-suite-comfyui repo?").error.print()
+                    cstr(f"Unable to find cascade XML file at `{cascade}`. Did you pull the latest files from https://github.com/ltdrdata/was-node-suite-comfyui repo?").error.print()
                     return (pil2tensor(Image.new("RGB", (512,512), (0,0,0))), False)
                 face_cascade = cv2.CascadeClassifier(cascade)
                 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -7208,7 +7252,7 @@ class WAS_Export_API:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "save_prompt_api": (["true","true"],),
+                "save_prompt_api": (["true","false"],),
                 "output_path": ("STRING", {"default": "./ComfyUI/output/", "multiline": False}),
                 "filename_prefix": ("STRING", {"default": "ComfyUI_Prompt"}),
                 "filename_delimiter": ("STRING", {"default":"_"}),
@@ -7255,7 +7299,6 @@ class WAS_Export_API:
         output_file = os.path.abspath(os.path.join(output_path, file))
 
         if prompt:
-
             if parse_text_tokens:
                 prompt = self.parse_prompt(prompt, tokens, keys_to_parse)
 
@@ -7264,11 +7307,14 @@ class WAS_Export_API:
             print(prompt_json)
 
             if save_prompt_api == "true":
+                if isAllowedFilepath(output_file):
+                    with open(output_file, 'w') as f:
+                        f.write(prompt_json)
 
-                with open(output_file, 'w') as f:
-                    f.write(prompt_json)
-
-                cstr(f"Output file path: {output_file}").msg.print()
+                    cstr(f"Output file path: {output_file}").msg.print()
+                else:
+                    cstr(f"'{os.path.abspath(output_file)}' is a write-protected path. Please add it to the whitelist file and restart.\n=> {WAS_USER_CONFIG_WHITELIST_DIRS_FILE}").error.print()
+                    raise Exception(f"'{output_file}' is a write-protected path. Please add it to the whitelist file")
 
         return {"ui": {"string": prompt_json}}
 
@@ -10819,9 +10865,14 @@ class WAS_Text_Save:
         number_padding = int(filename_number_padding)
         filename = self.generate_filename(path, filename_prefix, delimiter, number_padding, file_extension, filename_suffix)
         file_path = os.path.join(path, filename)
-        self.write_text_file(file_path, text, encoding)
-        update_history_text_files(file_path)
-        return (text, {"ui": {"string": text}})
+
+        if isAllowedFilepath(file_path):
+            self.write_text_file(file_path, text, encoding)
+            update_history_text_files(file_path)
+            return (text, {"ui": {"string": text}})
+        else:
+            cstr(f"'{os.path.abspath(file_path)}' is a write-protected path. Please add it to the whitelist file and restart\n=> {WAS_USER_CONFIG_WHITELIST_DIRS_FILE}").error.print()
+            raise Exception(f"'{file_path}' is a write-protected path.\nPlease add it to the whitelist file")
 
     def generate_filename(self, path, prefix, delimiter, number_padding, extension, suffix):
         if number_padding == 0:
@@ -14637,7 +14688,7 @@ if os.path.exists(BKAdvCLIP_dir):
 
         DESCRIPTION = "A node based on Blenderneko's <a href='https://github.com/BlenderNeko/ComfyUI_ADV_CLIP_embw' target='_blank'>Advanced CLIP Text Encode</a>. This version adds the ability to use Noodle Soup Prompts and Wildcards. Wildcards are stored in WAS Node Suite root under the folder 'wildcards'. You can create the folder if it doesn't exist and move your wildcards into it."
         URL = {
-            "Example Workflow": "https://github.com/WASasquatch/was-node-suite-comfyui",
+            "Example Workflow": "https://github.com/ltdrdata/was-node-suite-comfyui",
         }
         IMAGES = [
             "https://i.postimg.cc/Jh4N2h5r/CLIPText-Encode-BLK-plus-NSP.png",
