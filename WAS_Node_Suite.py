@@ -12538,7 +12538,7 @@ class WAS_Random_Number:
         # Return random number
         if number_type:
             if number_type == 'integer':
-                number = random.randint(minimum, maximum)
+                number = random.randint(int(minimum), int(maximum))
             elif number_type == 'float':
                 number = random.uniform(minimum, maximum)
             elif number_type == 'bool':
@@ -14879,3 +14879,4 @@ if show_quotes:
         '\033[93m"Every strike brings me closer to the next home run."\033[0m\033[3m - Babe Ruth',
     ]
     print(f'\n\t\033[3m{random.choice(art_quotes)}\033[0m\n')
+
